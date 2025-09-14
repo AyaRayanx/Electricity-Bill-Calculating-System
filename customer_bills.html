@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <h3 class="mb-4">{{ title }}</h3>
+
+    {% if rows %}
+    <table class="table table-hover shadow-sm bg-white">
+        <thead class="table-dark">
+            <tr>
+                <th>Month</th>
+                <th>Year</th>
+                <th>Consumption (kWh)</th>
+                <th>Bill Amount ($)</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set total_due = 0 %}
+            {% for row in rows %}
+            <tr>
+                <td>{{ row['month'] }}</td>
+                <td>{{ row['year'] }}</td>
+                <td>{{ row['consumption_kwh'] }}</td>
+                <td>{{ "%.2f"|format(row['amount_due']) }}</td>
+                <td>
+                    {% if row['is_paid'] %}
+                        <span class="badge bg-success">Paid</span>
+                    {% else %}
+                        <span class="badge bg-danger">Unpaid</span>
+                        {% set total_due = total_due + row['amount_due'] %}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if title == "Unpaid Bills" and total_due > 0 %}
+    <div class="alert alert-warning">
+        <strong>Total Unpaid Amount:</strong> ${{ "%.2f"|format(total_due) }}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="alert alert-info">No bills found.</div>
+    {% endif %}
+
+    <a href="/customer" class="btn btn-secondary mt-3">Back to Dashboard</a>
+</div>
+
+</body>
+</html>
